@@ -320,6 +320,10 @@ else
     chmod 600 "$STEP_CA_PASSWORD_FILE"
 fi
 
+if [ -f "$INSTALL_DIR/settings.py" ]; then
+    sed -i "s/STEP_CA_NAME = .*/STEP_CA_NAME = \"${STEP_CA_NAME}\"/" "$INSTALL_DIR/settings.py"
+fi
+
 # 9-3. CA 초기화
 if [ -f "$CA_DIR/config/ca.json" ]; then
     echo "CA가 이미 초기화된 것으로 보입니다(ca.json 존재). 초기화를 건너뜁니다."
@@ -340,8 +344,24 @@ else
         
     echo "CA 초기화가 완료되었습니다."
     
-    # 9-4. ca.json 패치 (인증서 유효기간 설정)
-    echo "ca.json 패치 중 (인증서 유효기간 설정)..."
+    # 9-4. 인증서 템플릿 생성 (CDP 포함)
+    echo "인증서 템플릿 생성 (leaf.tpl)..."
+    mkdir -p "$CA_DIR/templates"
+    cat <<EOF > "$CA_DIR/templates/leaf.tpl"
+{
+    "subject": {{ toJson .Subject }},
+    "sans": {{ toJson .SANs }},
+{{- if .Token }}
+    "token": "{{ .Token }}",
+{{- end }}
+    "keyUsage": ["digitalSignature", "keyEncipherment"],
+    "extKeyUsage": ["serverAuth", "clientAuth"],
+    "crlDistributionPoints": ["https://${DOMAIN_NAME}/crl"]
+}
+EOF
+
+    # 9-5. ca.json 패치 (인증서 유효기간 및 템플릿 설정)
+    echo "ca.json 패치 중 (인증서 유효기간, CRL, 템플릿 설정)..."
     # Python 스크립트 내 변수 주입을 위해 환경변수 export
     export PY_CERT_VALID_HOURS="${CERT_VALID_HOURS}h"
     
@@ -359,36 +379,50 @@ if os.path.exists(config_path):
     
     updated = False
 
-    # 1. Enable CRL
+    # 1. Enable CRL (Duration 30 days)
     if "crl" not in data:
-        data["crl"] = {"enabled": True, "generateOnRevoke": True}
+        data["crl"] = {"enabled": True, "generateOnRevoke": True, "duration": "720h"}
         updated = True
-    elif not data["crl"].get("enabled"):
-        data["crl"]["enabled"] = True
-        data["crl"]["generateOnRevoke"] = True
-        updated = True
+    else:
+        # Update existing CRL settings
+        if not data["crl"].get("enabled"):
+            data["crl"]["enabled"] = True
+            updated = True
+        if not data["crl"].get("generateOnRevoke"):
+            data["crl"]["generateOnRevoke"] = True
+            updated = True
+        if data["crl"].get("duration") != "720h":
+            data["crl"]["duration"] = "720h"
+            updated = True
 
-    # 2. Find admin provisioner and add claims
+    # 2. Find admin provisioner and add claims & template
     if "authority" in data and "provisioners" in data["authority"]:
         for prov in data["authority"]["provisioners"]:
             if prov["name"] == "admin":
+                # Claims
                 prov["claims"] = {
                     "enableSSHCA": True,
                     "maxTLSCertDuration": cert_duration,
                     "defaultTLSCertDuration": default_duration
+                }
+                # Template
+                prov["options"] = {
+                    "x509": {
+                        "templateFile": "templates/leaf.tpl"
+                    }
                 }
                 updated = True
     
     if updated:
         with open(config_path, "w") as f:
             json.dump(data, f, indent=4)
-        print(f"ca.json 업데이트 성공 (CRL 활성화, Duration: {cert_duration})")
+        print(f"ca.json 업데이트 성공 (CRL 30일, Templates 적용, Duration: {cert_duration})")
     else:
         print("ca.json 변경 사항 없음.")
 '
 fi
 
-# 9-5. 권한 설정
+# 9-6. 권한 설정
 echo "사용자 권한 설정 중 ($SVC_USER:$SVC_GROUP)..."
 mkdir -p "$INSTALL_DIR/certs"
 touch "$INSTALL_DIR/app.log"

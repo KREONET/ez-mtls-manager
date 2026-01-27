@@ -339,8 +339,24 @@ else
         
     echo "CA Initialization complete."
     
-    # 9-4. Patch ca.json (Certificate Validity)
-    echo "Patching ca.json (Setting certificate validity)..."
+    # 9-4. Generate Certificate Template (Including CDP)
+    echo "Generating certificate template (leaf.tpl)..."
+    mkdir -p "$CA_DIR/templates"
+    cat <<EOF > "$CA_DIR/templates/leaf.tpl"
+{
+    "subject": {{ toJson .Subject }},
+    "sans": {{ toJson .SANs }},
+{{- if .Token }}
+    "token": "{{ .Token }}",
+{{- end }}
+    "keyUsage": ["digitalSignature", "keyEncipherment"],
+    "extKeyUsage": ["serverAuth", "clientAuth"],
+    "crlDistributionPoints": ["https://${DOMAIN_NAME}/crl"]
+}
+EOF
+
+    # 9-5. Patch ca.json (Validity, CRL, Template)
+    echo "Patching ca.json (Validity, CRL, Template)..."
     # Export env var for Python script
     export PY_CERT_VALID_HOURS="${CERT_VALID_HOURS}h"
     
@@ -358,36 +374,50 @@ if os.path.exists(config_path):
     
     updated = False
 
-    # 1. Enable CRL
+    # 1. Enable CRL (Duration 30 days)
     if "crl" not in data:
-        data["crl"] = {"enabled": True, "generateOnRevoke": True}
+        data["crl"] = {"enabled": True, "generateOnRevoke": True, "duration": "720h"}
         updated = True
-    elif not data["crl"].get("enabled"):
-        data["crl"]["enabled"] = True
-        data["crl"]["generateOnRevoke"] = True
-        updated = True
+    else:
+         # Update existing CRL settings
+        if not data["crl"].get("enabled"):
+            data["crl"]["enabled"] = True
+            updated = True
+        if not data["crl"].get("generateOnRevoke"):
+            data["crl"]["generateOnRevoke"] = True
+            updated = True
+        if data["crl"].get("duration") != "720h":
+            data["crl"]["duration"] = "720h"
+            updated = True
 
-    # 2. Find admin provisioner and add claims
+    # 2. Find admin provisioner and add claims & template
     if "authority" in data and "provisioners" in data["authority"]:
         for prov in data["authority"]["provisioners"]:
             if prov["name"] == "admin":
+                # Claims
                 prov["claims"] = {
                     "enableSSHCA": True,
                     "maxTLSCertDuration": cert_duration,
                     "defaultTLSCertDuration": default_duration
+                }
+                # Template
+                prov["options"] = {
+                    "x509": {
+                        "templateFile": "templates/leaf.tpl"
+                    }
                 }
                 updated = True
     
     if updated:
         with open(config_path, "w") as f:
             json.dump(data, f, indent=4)
-        print(f"Successfully updated ca.json (CRL Enabled, Duration: {cert_duration})")
+        print(f"Successfully updated ca.json (CRL 30days, Templates, Duration: {cert_duration})")
     else:
         print("No changes needed for ca.json.")
 '
 fi
 
-# 9-5. Set Permissions
+# 9-6. Set Permissions
 echo "Setting permissions ($SVC_USER:$SVC_GROUP)..."
 mkdir -p "$INSTALL_DIR/certs"
 touch "$INSTALL_DIR/app.log"
