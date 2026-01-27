@@ -6,7 +6,7 @@
 
 ### 1. 인증 및 사용자 관리
 
-- **Multi-IdP 지원:** 인증 소스로 OIDC([KAFE](https://www.kafe.or.kr), [Auth0](https://auth0.com)) 및 [Atlassian Crowd](https://www.atlassian.com/software/crowd)를 지원하며, 내부/외부 사용자 통합 관리가 가능합니다.
+- **Multi-IdP 지원:** 인증 소스로 OIDC([KAFE](https://www.kafe.or.kr), [Auth0](https://auth0.com)) 및 [Atlassian Crowd](https://www.atlassian.com/software/crowd)를 지원합니다.
 - **다국어 지원:** 한국어와 영어를 지원하며, 브라우저 언어 설정에 따라 자동으로 전환됩니다.
 
 ### 2. 셀프 서비스 인증서 발급

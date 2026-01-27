@@ -8,7 +8,7 @@
 
 ### 1. Authentication & User Management
 
-- **Multi-IdP Support:** Supports OIDC ([KAFE](https://www.kafe.or.kr), [Auth0](https://auth0.com)) and [Atlassian Crowd](https://www.atlassian.com/software/crowd) as authentication sources, allowing unified management of internal/external users.
+- **Multi-IdP Support:** Supports OIDC ([KAFE](https://www.kafe.or.kr), [Auth0](https://auth0.com)) and [Atlassian Crowd](https://www.atlassian.com/software/crowd) as authentication sources.
 - **Multi-language Support:** Supports Korean and English, automatically switching based on browser language settings.
 
 ### 2. Self-Service Certificate Issuance
