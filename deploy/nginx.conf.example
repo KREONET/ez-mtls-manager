@@ -19,7 +19,7 @@ server {
     # include /etc/letsencrypt/options-ssl-nginx.conf;
     # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    location = /crl {
+    location = /1.0/crl {
         allow all;
 
         proxy_pass http://127.0.0.1:5000/crl;

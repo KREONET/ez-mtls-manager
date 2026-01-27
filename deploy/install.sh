@@ -319,6 +319,10 @@ else
     chmod 600 "$STEP_CA_PASSWORD_FILE"
 fi
 
+if [ -f "$INSTALL_DIR/settings.py" ]; then
+    sed -i "s/STEP_CA_NAME = .*/STEP_CA_NAME = \"${STEP_CA_NAME}\"/" "$INSTALL_DIR/settings.py"
+fi
+
 # 9-3. Init CA
 if [ -f "$CA_DIR/config/ca.json" ]; then
     echo "CA seems already initialized (ca.json exists). Skipping initialization."
@@ -351,10 +355,10 @@ else
 {{- end }}
     "keyUsage": ["digitalSignature", "keyEncipherment"],
     "extKeyUsage": ["serverAuth", "clientAuth"],
-    "crlDistributionPoints": ["https://${DOMAIN_NAME}/crl"]
+    "crlDistributionPoints": ["https://${DOMAIN_NAME}/1.0/crl"]
 }
 EOF
-
+    
     # 9-5. Patch ca.json (Validity, CRL, Template)
     echo "Patching ca.json (Validity, CRL, Template)..."
     # Export env var for Python script
@@ -376,7 +380,7 @@ if os.path.exists(config_path):
 
     # 1. Enable CRL (Duration 30 days)
     if "crl" not in data:
-        data["crl"] = {"enabled": True, "generateOnRevoke": True, "duration": "720h"}
+        data["crl"] = {"enabled": True, "generateOnRevoke": True, "cacheDuration": "720h"}
         updated = True
     else:
          # Update existing CRL settings
@@ -386,8 +390,8 @@ if os.path.exists(config_path):
         if not data["crl"].get("generateOnRevoke"):
             data["crl"]["generateOnRevoke"] = True
             updated = True
-        if data["crl"].get("duration") != "720h":
-            data["crl"]["duration"] = "720h"
+        if data["crl"].get("cacheDuration") != "720h":
+            data["crl"]["cacheDuration"] = "720h"
             updated = True
 
     # 2. Find admin provisioner and add claims & template

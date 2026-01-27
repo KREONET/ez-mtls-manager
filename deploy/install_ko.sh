@@ -238,7 +238,7 @@ if [ -z "$CURRENT_FLASK_SECRET_KEY" ] || [ "$is_default_secret_key" -eq 1 ]; the
     if grep -q "FLASK_SECRET_KEY =" "$INSTALL_DIR/settings.py"; then
         sed -i "s/FLASK_SECRET_KEY = .*/FLASK_SECRET_KEY = \"${NEW_SECRET_KEY}\"/" "$INSTALL_DIR/settings.py"
     else
-        echo "FLASK_SECRET_KEY = \"${NEW_SECRET_KEY}\"" >> "$INSTALL_DIR/settings.py"
+    echo "FLASK_SECRET_KEY = \"${NEW_SECRET_KEY}\"" >> "$INSTALL_DIR/settings.py"
     fi
 fi
 
@@ -356,10 +356,10 @@ else
 {{- end }}
     "keyUsage": ["digitalSignature", "keyEncipherment"],
     "extKeyUsage": ["serverAuth", "clientAuth"],
-    "crlDistributionPoints": ["https://${DOMAIN_NAME}/crl"]
+    "crlDistributionPoints": ["https://${DOMAIN_NAME}/1.0/crl"]
 }
 EOF
-
+    
     # 9-5. ca.json 패치 (인증서 유효기간 및 템플릿 설정)
     echo "ca.json 패치 중 (인증서 유효기간, CRL, 템플릿 설정)..."
     # Python 스크립트 내 변수 주입을 위해 환경변수 export
@@ -381,7 +381,7 @@ if os.path.exists(config_path):
 
     # 1. Enable CRL (Duration 30 days)
     if "crl" not in data:
-        data["crl"] = {"enabled": True, "generateOnRevoke": True, "duration": "720h"}
+        data["crl"] = {"enabled": True, "generateOnRevoke": True, "cacheDuration": "720h"}
         updated = True
     else:
         # Update existing CRL settings
@@ -391,8 +391,8 @@ if os.path.exists(config_path):
         if not data["crl"].get("generateOnRevoke"):
             data["crl"]["generateOnRevoke"] = True
             updated = True
-        if data["crl"].get("duration") != "720h":
-            data["crl"]["duration"] = "720h"
+        if data["crl"].get("cacheDuration") != "720h":
+            data["crl"]["cacheDuration"] = "720h"
             updated = True
 
     # 2. Find admin provisioner and add claims & template
