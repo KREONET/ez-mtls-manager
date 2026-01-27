@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.menu_admin_logs }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="mb-1">{{ t.menu_admin_logs }}</h2>
+        <p class="text-muted mb-0">Total Logs: {{ pagination.total }}</p>
+    </div>
+</div>
+
+<div class="card shadow-sm p-4 mb-4">
+    <form method="GET" class="row g-3">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i> Search</span>
+                <input type="text" name="q" class="form-control" placeholder="User, Action, Detail, IP..."
+                    value="{{ q }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+                {% if q %}
+                <a href="{{ url_for('admin.admin_logs') }}" class="btn btn-secondary">Reset</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0 align-middle table-responsive-stack" id="logTable"
+            style="font-size: 0.9rem;">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th class="ps-3 text-nowrap">{{ t.col_date }}</th>
+                    <th class="text-nowrap">{{ t.col_idp }}</th>
+                    <th class="text-nowrap">{{ t.col_user }}</th>
+                    <th class="text-nowrap">{{ t.col_cn }}</th>
+                    <th class="text-nowrap">{{ t.col_action }}</th>
+                    <th class="text-nowrap">{{ t.col_detail }}</th>
+                    <th class="text-nowrap">{{ t.col_ip }}</th>
+                    <th class="pe-3 text-nowrap">{{ t.col_device }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in pagination.items %}
+                <tr>
+                    <td data-label="{{ t.col_date }}" class="ps-3 text-nowrap">{{ log.logged_at }}</td>
+                    <td data-label="{{ t.col_idp }}">{{ log.idp or '-' }}</td>
+                    <td data-label="{{ t.col_user }}">{{ log.user_name or '-' }}</td>
+                    <td data-label="{{ t.col_cn }}">{{ log.common_name }}</td>
+                    <td data-label="{{ t.col_action }}"><span class="badge bg-light text-dark border">{{ log.action
+                            }}</span></td>
+                    <td data-label="{{ t.col_detail }}">{{ log.detail or '-' }}</td>
+                    <td data-label="{{ t.col_ip }}">{{ log.ip_address }}</td>
+                    <td data-label="{{ t.col_device }}" class="pe-3">
+                        <div class="text-truncate" style="max-width: 200px;" title="{{ log.user_agent }}">{{
+                            log.user_agent | parse_ua }}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.admin_logs', page=pagination.prev_num, q=q) }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        {% if page_num == pagination.page %}
+        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('admin.admin_logs', page=page_num, q=q) }}">{{ page_num
+                }}</a></li>
+        {% endif %}
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.admin_logs', page=pagination.next_num, q=q) }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+    </ul>
+</nav>
+
+{% endblock %}

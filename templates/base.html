@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}{% endblock %} - EZ mTLS Manager</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+	<!--
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+	<header class="sticky-top">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+			<div class="container">
+				<a class="navbar-brand" href="{{ url_for('main.index') }}">🔒 EZ mTLS Manager</a>
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+					aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						{% if current_user.is_admin %}
+						<li class="nav-item">
+							<a class="nav-link text-danger" href="{{ url_for('admin.admin_cert') }}">{{ t.menu_admin_certs
+								}}</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link text-danger" href="{{ url_for('admin.admin_logs') }}">{{ t.menu_admin_logs
+								}}</a>
+						</li>
+						{% endif %}
+						{% if current_user.is_authenticated %}
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('user.cert') }}">{{ t.menu_my_certs }}</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="{{ url_for('user.user_log') }}">{{ t.menu_my_logs }}</a>
+						</li>
+						{% endif %}
+						<li class="nav-item">
+							<a class="nav-link" href="{{ manual_url }}" target="_blank">{{ t.menu_manual }}</a>
+						</li>
+					</ul>
+
+					<ul class="navbar-nav">
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+								aria-expanded="false">
+								🌐
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end">
+								<li><a class="dropdown-item" href="?lang=en">🇺🇸 English</a></li>
+								<li><a class="dropdown-item" href="?lang=ko">🇰🇷 한국어</a></li>
+							</ul>
+						</li>
+						<li class="nav-item dropdown">
+							{% if current_user.is_authenticated %}
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+								aria-expanded="false" title="{{ current_user.email }}">
+								{{ current_user.display_name }}
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end">
+								<li><span class="dropdown-item">IdP: {{ current_user.idp }}</span></li>
+								<li><span class="dropdown-item">Email: {{ current_user.email }}</span></li>
+								<li><span class="dropdown-item">CN: {{ current_user.cn }}</span></li>
+								<li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">{{ t.logout }}</a></li>
+							</ul>
+							{% else %}
+						<li class="nav-item">
+							<a href="{{ url_for('auth.login_selection') }}" class="nav-link">{{ t.login }}</a>
+						</li>
+						{% endif %}
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+
+	<main class="container my-4">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		<div class="flash-messages mb-3">
+			{% for category, message in messages %}
+			<div class="alert alert-{{ category if category != 'message' else 'primary' }} alert-dismissible fade show"
+				role="alert">
+				{{ message }}
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+			{% endfor %}
+		</div>
+		{% endif %}
+		{% endwith %}
+		<div class="p-4 bg-white border rounded-3 shadow-sm">
+			{% block content %}{% endblock %}
+		</div>
+	</main>
+	<footer class="mt-auto py-3 bg-light">
+		<div class="container text-center text-muted">
+			&copy; 2026 KREONET. All rights reserved.
+		</div>
+	</footer>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

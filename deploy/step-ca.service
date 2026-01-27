@@ -1,0 +1,16 @@
+[Unit]
+Description=SmallStep CA Service
+Documentation=https://smallstep.com/docs/step-ca
+After=network.target
+
+[Service]
+User=flask
+Group=flask
+WorkingDirectory=/opt/ez-mtls-manager/step-ca
+Environment=STEPPATH=/opt/ez-mtls-manager/step-ca
+ExecStart=/usr/bin/step-ca /opt/ez-mtls-manager/step-ca/config/ca.json --password-file /opt/ez-mtls-manager/step-ca/password.txt
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

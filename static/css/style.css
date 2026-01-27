@@ -1,0 +1,94 @@
+:root {
+  --kreonet-blue: #0056b3;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f4f7f9;
+}
+
+main {
+  flex: 1;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  letter-spacing: -0.5px;
+}
+
+footer {
+  background-color: #e9ecef;
+  padding: 1.2rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6c757d;
+  border-top: 1px solid #dee2e6;
+}
+
+/* 테이블 텍스트 최적화 */
+.cert-table {
+  font-size: 0.875rem;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-size: 0.8rem;
+}
+
+.text-truncate-custom {
+  max-width: 180px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+/* === 모바일 반응형 카드 전환 전략 === */
+@media (max-width: 991.98px) {
+  .table-responsive-stack thead {
+    display: none;
+  }
+
+  /* 헤더 숨김 */
+  .table-responsive-stack tr {
+    display: block;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .table-responsive-stack td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .table-responsive-stack td:last-child {
+    border-bottom: none;
+    background: #fafafa;
+    justify-content: center;
+  }
+
+  .table-responsive-stack td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #495057;
+    text-align: left;
+    flex: 1;
+  }
+
+  .text-truncate-custom {
+    max-width: 100% !important;
+  }
+
+  .mobile-column {
+    flex-direction: column;
+    align-items: flex-end !important;
+  }
+}

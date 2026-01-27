@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# System
+.DS_Store
+.vscode
+
+# Logs
+*.log
+
+# Production
+settings.py
+step-ca/
+certs/

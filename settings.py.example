@@ -1,0 +1,74 @@
+# CROWD Configuration (CROWD 설정)
+CROWD_IDP_NAME = "CROWD"
+CROWD_BASE_URL = "https://crowd.example.com/crowd"
+CROWD_APP_NAME = "ez-mtls"
+CROWD_APP_PASSWORD = "CHANGE_ME_CROWD_APP_PASSWORD"
+
+# OIDC Configuration (OIDC 설정)
+OIDC_IDP_NAME = "OIDC"
+OIDC_CLIENT_ID = "CHANGE_ME_OIDC_CLIENT_ID"
+OIDC_CLIENT_SECRET = "CHANGE_ME_OIDC_CLIENT_SECRET"
+OIDC_DOMAIN = "your-tenant.auth0.com"
+
+# Database Configuration (데이터베이스 설정)
+DB_USER = "ezmtls"
+DB_PASSWORD = "CHANGE_ME_DB_PASSWORD"
+DB_HOST = "localhost"
+DB_PORT = 3306
+DB_NAME = "ezmtls"
+
+SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# Admin Email List (comma separated) (관리자 이메일 목록 (쉼표로 구분))
+ADMIN_EMAILS = [
+    "admin@example.com",
+    "manager@example.com"
+    ]
+
+# Shared Email Accounts (공유 이메일 계정)
+SHARED_EMAIL_ACCOUNTS = [
+    "shared@example.com",
+    "secretariat@example.com",
+    ]
+
+def generate_cn_for_shared_email_user(username):
+    """
+    Logic to generate a unique CN based on the shared account's Username.
+    Default: No transformation (use username as is)
+    Modify is needed.
+
+    공용 계정의 Username을 기반으로 고유한 CN을 생성하는 로직.
+    기본값: 변환 없음 (username 그대로 사용)
+    필요 시 수정하여 사용하세요.
+    """
+    return username
+
+# SMTP Email Notification Settings (이메일 알림 설정 (SMTP))
+SMTP_SERVER = "smtp.example.com"
+SMTP_PORT = 587
+SMTP_USER = "noreply@example.com"
+SMTP_PASSWORD = "CHANGE_ME"
+SMTP_USE_TLS = True
+SMTP_DEFAULT_SENDER = ("EZmTLS Manager", "noreply@example.com")
+
+# Log Level Settings (DEBUG, INFO, WARNING, ERROR, CRITICAL) (로그 레벨 설정)
+LOGLEVEL = "INFO"
+
+# Flask Secret Key (Flask 보안 키)
+FLASK_SECRET_KEY = "CHANGE_ME_FLASK_SECRET_KEY"
+
+# User Guide URL (사용자 가이드 URL)
+MANUAL_URL = "https://wiki.kreonet.net/ezmtls/"
+
+# Step CA Configuration (Step CA 설정)
+STEP_CA_PATH = "/opt/ez-mtls-manager/step-ca"
+STEP_ROOT_CA = f"{STEP_CA_PATH}/certs/root_ca.crt"
+STEP_INTERMEDIATE_CA = f"{STEP_CA_PATH}/certs/intermediate_ca.crt"
+STEP_CA_PASSWORD_FILE = f"{STEP_CA_PATH}/password.txt"
+
+# CA Name (Suffix "CA" will be appended) (CA 이름 (뒤에 "CA"가 추가됩니다))
+STEP_CA_NAME = "EZmTLS"
+
+# Certificate Validity Hours (Default 90 days = 2160 hours) (인증서 유효 시간 (시간 단위, 기본 90일 = 2160시간))
+STEP_CERT_VALID_HOURS = 2160

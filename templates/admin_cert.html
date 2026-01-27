@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.menu_admin_certs }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="mb-1">{{ t.menu_admin_certs }}</h2>
+        <p class="text-muted mb-0">Total Certificates: {{ pagination.total }}</p>
+    </div>
+</div>
+
+<div class="card shadow-sm p-4 mb-4">
+    <form method="GET" class="row g-3">
+        <div class="col-md-8">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i> Search</span>
+                <input type="text" name="q" class="form-control" placeholder="User, CN, Serial..." value="{{ q }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+                {% if q %}
+                <a href="{{ url_for('admin.admin_cert') }}" class="btn btn-secondary">Reset</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive border-0">
+    <table class="table table-hover align-middle cert-table table-responsive-stack">
+        <thead class="table-light">
+            <tr>
+                <th class="ps-3">{{ t.col_no }}</th>
+                <th>{{ t.col_idp }}</th>
+                <th>{{ t.col_user }}</th>
+                <th>{{ t.col_cn }}</th>
+                <th>{{ t.col_status }}</th>
+                <th>{{ t.col_valid_from }}</th>
+                <th>{{ t.col_valid_until }}</th>
+                <th>{{ t.col_serial_fp }}</th>
+                <th class="pe-3 text-center">{{ t.col_action }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cert in pagination.items %}
+            <tr>
+                <td data-label="{{ t.col_no }}" class="ps-md-3">{{ cert.id }}</td>
+                <td data-label="{{ t.col_idp }}">{{ cert.idp or '-' }}</td>
+                <td data-label="{{ t.col_user }}">{{ cert.user_name or '-' }}</td>
+                <td data-label="{{ t.col_cn }}">{{ cert.common_name }}</td>
+                <td data-label="{{ t.col_status }}">
+                    {% if cert.status == 'valid' %}
+                    <span class="badge bg-success">{{ t.status_valid }}</span>
+                    {% elif cert.status == 'revoked' %}
+                    <span class="badge bg-danger">{{ t.status_revoked }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ t.status_expired }}</span>
+                    {% endif %}
+                </td>
+                <td data-label="{{ t.col_valid_from }}">{{ cert.issued_at }}</td>
+                <td data-label="{{ t.col_valid_until }}">{{ cert.expires_at }}</td>
+                <td data-label="{{ t.col_serial_fp }}">
+                    <div class="d-flex flex-column" style="max-width: 250px; font-family: monospace; font-size: 0.8em;">
+                        <div class="d-flex">
+                            <strong class="me-1">Serial:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.serial }}">
+                                {{ cert.serial }}
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <strong class="me-1">SHA1:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.fingerprint_sha1 }}">
+                                {{ cert.fingerprint_sha1 }}
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <strong class="me-1">SHA256:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.fingerprint_sha256 }}">
+                                {{ cert.fingerprint_sha256 }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td data-label="{{ t.col_action }}">
+                    {% if cert.status == 'valid' %}
+                    <div class="d-flex gap-2 justify-content-center">
+                        <form action="{{ url_for('user.download_certificate', cert_id=cert.id) }}" method="GET">
+                            <button class="btn btn-sm btn-primary px-3" title="{{ t.action_download }}"><i
+                                    class="bi bi-download"></i></button>
+                        </form>
+                        <form action="{{ url_for('user.revoke_certificate', cert_id=cert.id) }}" method="POST"
+                            onsubmit="return confirm('{{ t.msg_revoke_confirm }}');">
+                            <button class="btn btn-sm btn-outline-danger px-3" title="{{ t.action_revoke }}"><i
+                                    class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.admin_cert', page=pagination.prev_num, q=q) }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        {% if page_num == pagination.page %}
+        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('admin.admin_cert', page=page_num, q=q) }}">{{ page_num
+                }}</a></li>
+        {% endif %}
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('admin.admin_cert', page=pagination.next_num, q=q) }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock %}

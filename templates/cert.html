@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.menu_my_certs }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h2 class="mb-1">{{ t.menu_my_certs }}</h2>
+    </div>
+</div>
+
+<!-- Create Certificate Section -->
+<div class="card shadow-sm p-4 mb-4">
+    <h3 class="fs-5 mb-3">{{ t.create_cert }}</h3>
+    <p class="text-muted mb-3">{{ t.create_cert_desc }}</p>
+
+    {% if can_create %}
+    <form action="{{ url_for('user.create_certificate') }}" method="POST" class="row g-3 align-items-center">
+        <div class="col-auto flex-grow-1" style="max-width: 400px;">
+            <input type="password" name="p12_password" class="form-control" placeholder="{{ t.p12_password }}" required>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">{{ t.create_btn }}</button>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-warning mb-0">
+        {{ t.msg_cert_already_valid }}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Certificates Table -->
+<div class="table-responsive border-0">
+    <table class="table table-hover align-middle cert-table table-responsive-stack">
+        <thead class="table-light">
+            <tr>
+                <th class="ps-3">{{ t.col_no }}</th>
+                <th>{{ t.col_idp }}</th>
+                <th>{{ t.col_user }}</th>
+                <th>{{ t.col_cn }}</th>
+                <th>{{ t.col_status }}</th>
+                <th>{{ t.col_valid_from }}</th>
+                <th>{{ t.col_valid_until }}</th>
+                <th>{{ t.col_serial_fp }}</th>
+                <th class="pe-3 text-center">{{ t.col_action }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cert in certs %}
+            <tr>
+                <td data-label="{{ t.col_no }}" class="ps-md-3">{{ cert.id }}</td>
+                <td data-label="{{ t.col_idp }}">{{ cert.idp or '-' }}</td>
+                <td data-label="{{ t.col_user }}">{{ cert.user_name or '-' }}</td>
+                <td data-label="{{ t.col_cn }}">{{ cert.common_name }}</td>
+                <td data-label="{{ t.col_status }}">
+                    {% if cert.status == 'valid' %}
+                    <span class="badge bg-success">{{ t.status_valid }}</span>
+                    {% elif cert.status == 'revoked' %}
+                    <span class="badge bg-danger">{{ t.status_revoked }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ t.status_expired }}</span>
+                    {% endif %}
+                </td>
+                <td data-label="{{ t.col_valid_from }}">{{ cert.issued_at }}</td>
+                <td data-label="{{ t.col_valid_until }}">{{ cert.expires_at }}</td>
+                <td data-label="{{ t.col_serial_fp }}">
+                    <div class="d-flex flex-column" style="max-width: 250px; font-family: monospace; font-size: 0.8em;">
+                        <div class="d-flex">
+                            <strong class="me-1">Serial:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.serial }}">
+                                {{ cert.serial }}
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <strong class="me-1">SHA1:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.fingerprint_sha1 }}">
+                                {{ cert.fingerprint_sha1 }}
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <strong class="me-1">SHA256:</strong>
+                            <div class="text-truncate" style="overflow: hidden;" title="{{ cert.fingerprint_sha256 }}">
+                                {{ cert.fingerprint_sha256 }}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td data-label="{{ t.col_action }}">
+                    {% if cert.status == 'valid' %}
+                    <div class="d-flex gap-2 justify-content-center">
+                        <form action="{{ url_for('user.download_certificate', cert_id=cert.id) }}" method="GET">
+                            <button class="btn btn-sm btn-primary px-3" title="{{ t.action_download }}"><i
+                                    class="bi bi-download"></i></button>
+                        </form>
+                        <form action="{{ url_for('user.revoke_certificate', cert_id=cert.id) }}" method="POST"
+                            onsubmit="return confirm('{{ t.msg_revoke_confirm }}');">
+                            <button class="btn btn-sm btn-outline-danger px-3" title="{{ t.action_revoke }}"><i
+                                    class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

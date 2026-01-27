@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn instance to serve EZ-mTLS Manager
+After=network.target
+
+[Service]
+User=flask
+Group=flask
+WorkingDirectory=/opt/ez-mtls-manager
+Environment="PYTHONPATH=/opt/ez-mtls-manager"
+Environment="STEPPATH=/opt/ez-mtls-manager/step-ca"
+# Environment="STEPDEBUG=1"
+ExecStart=/usr/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 "app:app"
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

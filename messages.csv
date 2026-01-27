@@ -1,0 +1,52 @@
+id,en,ko
+index_desc,Secure your connections with ease. Web based Self-service mTLS certificate management.,쉽고 안전한 연결. 웹 기반 mTLS 인증서 자가 관리 시스템.
+btn_go_my_certs,Go to My Certs,내 인증서로 이동
+btn_read_manual,Read Manual,매뉴얼 읽기
+login,Login,로그인
+logout,Logout,로그아웃
+id,"ID (ITS, WIKI)","아이디 (ITS, 위키)"
+password,Password,비밀번호
+login_crowd,Login,로그인
+login_oidc,Login with KAFE (OIDC),KAFE (OIDC) 로그인
+menu_login,Login,로그인
+menu_admin_certs,All Certs,전체 인증서
+menu_admin_logs,All Logs,전체 로그
+menu_my_certs,My Certs,내 인증서
+menu_my_logs,My Logs,내 로그
+menu_manual,Manual,매뉴얼
+create_cert,Create New Certificate,새 인증서 발급
+create_cert_desc,Generate a new mTLS certificate for your device.,새로운 mTLS 인증서를 생성합니다.
+p12_password,"P12 Password (Min. 10 chars, Upper/Lower/Digit)","P12 비밀번호 (최소 10자, 대/소문자/숫자 포함)"
+create_btn,Create Certificate,인증서 생성
+col_no,No,No
+col_idp,IdP,IdP
+col_user,User,사용자
+col_cn,CN,CN
+col_status,Status,상태
+col_valid_from,Issued,생성일
+col_valid_until,Expires,만료일
+col_serial_fp,Serial / Fingerprint,Serial / Fingerprint
+col_action,Action,작업
+col_device,Device,기기
+col_detail,Detail,상세
+col_date,Date,일시
+col_ip,IP Address,IP 주소
+status_valid,Valid,유효함
+status_revoked,Revoked,폐기됨
+status_expired,Expired,만료됨
+action_download,Download,다운로드
+action_revoke,Revoke,폐기
+msg_revoke_confirm,Are you sure you want to revoke this certificate?,정말 이 인증서를 폐기하시겠습니까?
+msg_cert_already_valid,You already have a valid certificate. You can create a new one when your current certificate is within 7 days of expiration.,이미 유효한 인증서가 있습니다. 만료 7일 전부터 새로운 인증서를 생성할 수 있습니다.
+flash_login_fail,Crowd login failed (Check ID or Password).,Crowd 인증 실패 (ID 또는 비밀번호 확인).
+flash_oidc_error,OIDC authentication error.,OIDC 인증 중 오류가 발생했습니다.
+flash_admin_only,Admin access only.,관리자 권한이 필요합니다.
+flash_pwd_min_len,Password must be at least 10 characters.,비밀번호는 최소 10자 이상이어야 합니다.
+flash_pwd_upper,Password must contain at least one uppercase letter.,비밀번호에는 대문자가 반드시 포함되어야 합니다.
+flash_pwd_lower,Password must contain at least one lowercase letter.,비밀번호에는 소문자가 반드시 포함되어야 합니다.
+flash_pwd_digit,Password must contain at least one number.,비밀번호에는 숫자가 반드시 포함되어야 합니다.
+flash_cert_valid_exists,"You already have a valid certificate with more than 7 days remaining.","이미 유효한 인증서가 있습니다 (만료 7일 전부터 갱신 가능)."
+flash_cert_create_success,Certificate created successfully.,인증서가 성공적으로 생성되었습니다.
+flash_cert_create_error,"Error creating certificate: ","인증서 생성 실패: "
+flash_cert_revoked,Certificate revoked.,인증서가 폐기되었습니다.
+flash_revoke_failed,"Revocation failed: ","폐기 실패: "
