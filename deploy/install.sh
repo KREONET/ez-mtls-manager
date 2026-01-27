@@ -135,7 +135,17 @@ else
     fi
 fi
 
-# 3-2. Input Certificate Validity (7~365 days)
+# 3-2. Input Domain Name (FQDN)
+DEFAULT_DOMAIN=$(hostname -f)
+printf "Enter Domain Name (FQDN) for CRL/OCSP (Press Enter to use default '$DEFAULT_DOMAIN'): "
+read USER_DOMAIN_NAME
+if [ -z "$USER_DOMAIN_NAME" ]; then
+    export DOMAIN_NAME="$DEFAULT_DOMAIN"
+else
+    export DOMAIN_NAME="$USER_DOMAIN_NAME"
+fi
+
+# 3-3. Input Certificate Validity (7~365 days)
 while true; do
     printf "Enter Certificate Validity in days (7~365, Press Enter to use default ${DEFAULT_VALID_DAYS} days): "
     read USER_VALID_DAYS
@@ -315,13 +325,12 @@ if [ -f "$CA_DIR/config/ca.json" ]; then
 else
     echo "Running 'step ca init'..."
     
-    HOSTNAME=$(hostname -f)
     export STEPPATH="$CA_DIR"
     
     step ca init \
         --name "$STEP_CA_NAME" \
+        --dns "$DOMAIN_NAME" \
         --dns "localhost" \
-        --dns "$HOSTNAME" \
         --address ":8443" \
         --provisioner "admin" \
         --password-file "$STEP_CA_PASSWORD_FILE" \

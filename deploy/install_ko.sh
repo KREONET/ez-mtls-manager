@@ -134,7 +134,17 @@ else
     fi
 fi
 
-# 3-2. 인증서 유효기간 입력 (7~365일)
+# 3-2. 도메인 입력 (FQDN)
+DEFAULT_DOMAIN=$(hostname -f)
+printf "Enter Domain Name (FQDN) for CRL/OCSP (Press Enter to use default '$DEFAULT_DOMAIN'): "
+read USER_DOMAIN_NAME
+if [ -z "$USER_DOMAIN_NAME" ]; then
+    export DOMAIN_NAME="$DEFAULT_DOMAIN"
+else
+    export DOMAIN_NAME="$USER_DOMAIN_NAME"
+fi
+
+# 3-3. 인증서 유효기간 입력 (7~365일)
 while true; do
     printf "인증서 유효기간(일)을 입력하세요 (7~365, Enter 입력 시 기본값 ${DEFAULT_VALID_DAYS}일): "
     read USER_VALID_DAYS
@@ -316,13 +326,12 @@ if [ -f "$CA_DIR/config/ca.json" ]; then
 else
     echo "'step ca init' 실행 중..."
     
-    HOSTNAME=$(hostname -f)
     export STEPPATH="$CA_DIR"
     
     step ca init \
         --name "$STEP_CA_NAME" \
+        --dns "$DOMAIN_NAME" \
         --dns "localhost" \
-        --dns "$HOSTNAME" \
         --address ":8443" \
         --provisioner "admin" \
         --password-file "$STEP_CA_PASSWORD_FILE" \
