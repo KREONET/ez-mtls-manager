@@ -232,9 +232,10 @@ if [ -z "$CURRENT_FLASK_SECRET_KEY" ] || [ "$is_default_secret_key" -eq 1 ]; the
     fi
 fi
 
-# 6-4. 유효기간 설정 업데이트 (공통)
+# 6-4. 유효기간 및 CA 이름 설정 업데이트 (공통)
 if [ -f "$INSTALL_DIR/settings.py" ]; then
     sed -i "s/^CERT_VALID_HOURS = .*/CERT_VALID_HOURS = ${CERT_VALID_HOURS}/" "$INSTALL_DIR/settings.py"
+    sed -i "s/^STEP_CA_NAME = .*/STEP_CA_NAME = \"${STEP_CA_NAME}\"/" "$INSTALL_DIR/settings.py"
 fi
 
 
