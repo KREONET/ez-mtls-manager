@@ -99,9 +99,11 @@
 		</div>
 		{% endif %}
 		{% endwith %}
+		{% block main_wrapper %}
 		<div class="p-4 bg-white border rounded-3 shadow-sm">
 			{% block content %}{% endblock %}
 		</div>
+		{% endblock %}
 	</main>
 	<footer class="mt-auto py-3 bg-light">
 		<div class="container text-center text-muted">
