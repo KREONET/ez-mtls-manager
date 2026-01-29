@@ -15,6 +15,8 @@ from auth_crowd import CrowdAuthProvider
 import json
 import sys
 import re
+from datetime import datetime
+import pytz
 
 
 def configure_logging(app):
@@ -203,10 +205,15 @@ def create_app(config_object=settings):
 
     @app.context_processor
     def inject_trans():
+        tz_name = getattr(settings, 'TIMEZONE', 'Asia/Seoul')
+        tz = pytz.timezone(tz_name)
+        now = datetime.now(pytz.utc).astimezone(tz)
         return dict(
             t=g.trans,
             lang=g.lang,
-            manual_url=app.config.get("MANUAL_URL", "#")
+            manual_url=app.config.get("MANUAL_URL", "#"),
+            server_timezone=tz_name,
+            server_time=now
         )
 
     @app.template_filter('parse_ua')
@@ -244,6 +251,28 @@ def create_app(config_object=settings):
             browser_name = "Whale"
 
         return f"{os_name} / {browser_name}"
+
+    @app.template_filter('datetime_local')
+    def datetime_local(value, format="%Y-%m-%d %H:%M:%S"):
+        if value is None:
+            return ""
+        if isinstance(value, str):
+            try:
+                # If it's already a string, try to parse it assuming it's
+                # UTC-like or just return it if it fails
+                value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                return value
+
+        # Determine if naive or aware
+        if value.tzinfo is None:
+            # Assume UTC if naive, because that's what we store
+            utc_dt = pytz.utc.localize(value)
+        else:
+            utc_dt = value.astimezone(pytz.utc)
+
+        tz = pytz.timezone(getattr(settings, 'TIMEZONE', 'Asia/Seoul'))
+        return utc_dt.astimezone(tz).strftime(format)
 
     return app
 

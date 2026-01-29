@@ -45,7 +45,8 @@
             <tbody>
                 {% for log in pagination.items %}
                 <tr>
-                    <td data-label="{{ t.col_date }}" class="ps-3 text-nowrap">{{ log.logged_at }}</td>
+                    <td data-label="{{ t.col_date }}" class="ps-3 text-nowrap">
+                        {{ log.logged_at | datetime_local }}</td>
                     <td data-label="{{ t.col_idp }}">{{ log.idp or '-' }}</td>
                     <td data-label="{{ t.col_user }}">{{ log.user_name or '-' }}</td>
                     <td data-label="{{ t.col_cn }}">{{ log.common_name }}</td>
